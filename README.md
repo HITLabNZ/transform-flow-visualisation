@@ -11,6 +11,7 @@ Use [teapot][teapot] to build and install Transform Flow. You will need Ruby 1.9
 Once you've downloaded source code, build as follows:
 
 	$ cd transform-flow-visualisation
+	$ export OSX_SDK_VERSION=10.8
 	$ teapot fetch
 	$ teapot build Application/TransformFlowVisualisation variant-debug
 
