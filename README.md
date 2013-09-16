@@ -23,6 +23,14 @@ Currently, only Mac OS X and Linux are supported using standards conformant C++1
 
 [teapot]: http://www.kyusu.org
 
+## Sample Data Sets
+
+Sample data sets are included in a separate git submodule. To get this, clone this repository with `--recursive` or if you've already cloned the repository, use the submodule command:
+
+	$ git submodule update --init
+
+The data sets are then available in `./data/`.
+
 ## Stream Capture
 
 To create a data set, use the [Transform Flow Capture iOS][transform-flow-capture-ios] to record a sequence of image and sensor data. Use Xcode to download the data and then use the ./transform-flow-visualisation tool to browse the dataset.
