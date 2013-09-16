@@ -12,12 +12,12 @@ Once you've downloaded source code, build as follows:
 
 	$ cd transform-flow-visualisation
 	$ teapot fetch
-	$ teapot build Library/TransformFlow variant-debug
+	$ teapot build Application/TransformFlowVisualisation variant-debug
 
 To run Transform Flow visualisation with the included sample data:
 
-	$ cd "./teapot/platforms/transform-flow/$PLATFORM/Applications/Transform Flow"
-	$ ./transform-flow [path to dataset] BasicSensorMotionModel
+	$ cd "./teapot/platforms/transform-flow/$PLATFORM/Applications/Transform Flow Visualisation"
+	$ ./transform-flow-visualisation [path to dataset] BasicSensorMotionModel
 
 Currently, only Mac OS X and Linux are supported using standards conformant C++11 compilers.
 
@@ -25,11 +25,9 @@ Currently, only Mac OS X and Linux are supported using standards conformant C++1
 
 ## Stream Capture
 
-The current stream capture tool is written for iOS and compiled using Xcode. You can find this project in `opt/Video Stream Capture-iOS`.
+To create a data set, use the [Transform Flow Capture iOS][transform-flow-capture-ios] to record a sequence of image and sensor data. Use Xcode to download the data and then use the ./transform-flow-visualisation tool to browse the dataset.
 
-### Stream Format
-
-The video stream format consists of a directory of images and a CSV log file.
+[transform-flow-capture-ios]: https://github.com/HITLabNZ/transform-flow-capture-ios
 
 ## Contributing
 

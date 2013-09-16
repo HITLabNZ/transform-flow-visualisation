@@ -1,6 +1,6 @@
 
 add_application 'Transform Flow' do
-	compile_executable 'transform-flow' do
+	compile_executable 'transform-flow-visualisation' do
 		def source_files(environment)
 			FileList[root, "TransformFlow-Visualisation/**/*.cpp"]
 		end
