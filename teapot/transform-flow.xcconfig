@@ -1,0 +1,11 @@
+
+// The root directory of Dream Project:
+TEAPOT_ROOT=$(SRCROOT)/teapot
+TEAPOT_CONFIGURATION=transform-flow-visualisation
+
+OTHER_CFLAGS= -I$(TEAPOT_ROOT)/platforms/$(TEAPOT_CONFIGURATION)/darwin-osx-debug/include/freetype2 -I$(TEAPOT_ROOT)/platforms/$(TEAPOT_CONFIGURATION)/darwin-osx-debug/include
+
+OTHER_LDFLAGS=$(OTHER_CFLAGS) -lz -lpng -ljpeg -lbz2 -lfreetype -logg -lvorbisfile -lvorbis -lEuclid -lDream -lDreamDisplay -lDreamGraphics -lDreamAudioOpenAL -lDreamDisplayOSX -lDreamImaging -lDreamText -lDreamClient -lopencv_calib3d -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_imgproc -lopencv_ml -lopencv_photo -lopencv_video -lTransformFlow -framework OpenAL -framework OpenGL -framework Foundation -framework Cocoa -framework AppKit -framework CoreVideo -framework CoreServices -L$(TEAPOT_ROOT)/platforms/$(TEAPOT_CONFIGURATION)/darwin-osx-debug/lib
+
+// Include the basic Dream-Project configuration:
+#include "teapot.xcconfig"
