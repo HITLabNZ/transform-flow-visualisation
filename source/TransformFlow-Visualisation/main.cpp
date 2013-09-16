@@ -470,6 +470,9 @@ int main (int argc, const char * argv[])
 	
 	Path data_path = argv[1];
 	StringT motion_model_name = argv[2];
+
+	log_debug("Working directory", runtime_path);
+	log_debug("Loading data from path", data_path);
 	
 	Ref<MotionModel> motion_model;
 	
