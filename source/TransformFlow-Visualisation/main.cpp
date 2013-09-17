@@ -461,12 +461,13 @@ int main (int argc, const char * argv[])
 	using namespace Dream::Display;
 	
 	Path runtime_path = Path(argv[0]).parent_path();
-	Ref<TransformFlowApplicationDelegate> delegate = new TransformFlowApplicationDelegate(runtime_path);
 	
 	if (argc != 3) {
 		std::cerr << "Usage: " << Path(argv[0]).last_name_components().basename << " data-path motion-model" << std::endl;
 		return -1;
 	}
+	
+	Ref<TransformFlowApplicationDelegate> delegate = new TransformFlowApplicationDelegate(runtime_path);
 	
 	Path data_path = argv[1];
 	StringT motion_model_name = argv[2];
