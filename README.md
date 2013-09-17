@@ -1,6 +1,6 @@
 # Transform Flow Visualisation
 
-Transform Flow Visualisation is a tool for offline analyse of mobile device sensor data and video streams. It is designed to be a toolbox for developing new algorithms for image alignment, localisation and mapping.
+Transform Flow Visualisation is a tool for the offline analysis of mobile device sensor data and video streams. It is designed to assist with the development of tracking and registration algorithms for outdoor augmented reality.
 
 ## Build and Install
 
@@ -23,6 +23,10 @@ To run Transform Flow visualisation with the included sample data:
 Currently, only Mac OS X and Linux are supported using standards conformant C++11 compilers.
 
 [teapot]: http://www.kyusu.org
+
+## Controls
+
+To move back and forward in the data set, use `o` and `p` respectively.
 
 ## Sample Data Sets
 
