@@ -252,11 +252,11 @@ namespace TransformFlow
 					cache->marker_particles->add(center << 0, Vec3(0.5, 0.5, 0), Vec3(0, 0, 1), Vec2u(1, 1));
 				}
 
-				for (Vec2 offset : find_key_points(cache->image_buffer())) {
-					Vec2 center = (offset / _scale) + cache->image_box.min();
+				//for (Vec2 offset : find_key_points(cache->image_buffer())) {
+				//	Vec2 center = (offset / _scale) + cache->image_box.min();
 
-					cache->feature_particles->add(center << 0, Vec3(0.5, 0.5, 0), Vec3(0, 0, 1), Vec2u(1, 1), Vec3(0.5, 0.5, 0.2));
-				}
+				//	cache->feature_particles->add(center << 0, Vec3(0.5, 0.5, 0), Vec3(0, 0, 1), Vec2u(1, 1), Vec3(0.5, 0.5, 0.2));
+				//}
 			}
 		}
 		
