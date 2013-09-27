@@ -413,8 +413,9 @@ namespace TransformFlow
 	
 	TransformFlowApplicationDelegate::TransformFlowApplicationDelegate(const Path & runtime_path)
 	{
-		log_debug("Loader:", runtime_path);
 		_loader = Client::default_resource_loader(runtime_path);
+		
+		log_debug("Loader resource_path", _loader->resource_path());
 	}
 	
 	TransformFlowApplicationDelegate::~TransformFlowApplicationDelegate()
@@ -467,12 +468,13 @@ int main (int argc, const char * argv[])
 		return -1;
 	}
 	
+	log_debug("Working directory", runtime_path);
+	
 	Ref<TransformFlowApplicationDelegate> delegate = new TransformFlowApplicationDelegate(runtime_path);
 	
-	Path data_path = argv[1];
+	Path data_path = Path(argv[1]);
 	StringT motion_model_name = argv[2];
-
-	log_debug("Working directory", runtime_path);
+	
 	log_debug("Loading data from path", data_path);
 	
 	Ref<MotionModel> motion_model;
@@ -481,6 +483,8 @@ int main (int argc, const char * argv[])
 		motion_model = new BasicSensorMotionModel;
 	} else if (motion_model_name == "HybridMotionModel") {
 		motion_model = new HybridMotionModel;
+	} else {
+		std::cerr << "Unsupported motion model: " << motion_model_name << std::endl;
 	}
 	
 	delegate->set_data_path(data_path);
