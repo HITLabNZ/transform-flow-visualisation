@@ -153,7 +153,7 @@ namespace TransformFlow
 				_frame_program->link();
 				
 				auto binding = _frame_program->binding();
-				binding.set_texture_unit("diffuse_texture", 0);			
+				binding.set_texture_unit("diffuse_texture", 0);
 			}
 			
 			{
@@ -267,7 +267,7 @@ namespace TransformFlow
 
 			auto frames = range_for(_frame_cache, _start, _count);
 
-			{				
+			{
 				glEnable(GL_DEPTH_TEST);
 
 				auto binding = _frame_program->binding();
