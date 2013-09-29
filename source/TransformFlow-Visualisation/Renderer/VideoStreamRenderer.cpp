@@ -182,9 +182,17 @@ namespace TransformFlow
 		{
 		}
 
+		// Return the vector component of u orthogonal to v:
+		static Vec3 project(const Vec3 & u, const Vec3 & v)
+		{
+			return u - (v * (u.dot(v) / v.dot(v)));
+		}
+
 		void VideoStreamRenderer::update_cache(Ptr<VideoStream> video_stream)
 		{
 			Shared<FrameCache> previous;
+			
+			Mat44 camera_transform = rotate<Z>(-90_deg);
 			
 			for (auto & frame : video_stream->frames())
 			{
@@ -200,30 +208,19 @@ namespace TransformFlow
 				Shared<FrameCache> cache = new FrameCache;
 				cache->image_box = image_box;
 				cache->video_frame = frame;
+				cache->global_transform = IDENTITY;
 
-				// We need to rotate the image such that the gravity vector is pointing directly down.
-				{
-					// Global down vector:
-					Vec3 down(0, -1, 0);
-
-					cache->global_transform = IDENTITY;
-
-					auto angle = down.angle_between(frame.gravity);
-					if (!number(angle.value).equivalent(0))
-					{
-						auto s = cross_product(frame.gravity, down).normalize();
-
-						Mat44 gravity_rotation = rotate(angle, s);
-
-						cache->global_transform = gravity_rotation;
-					}
-				}
+				// Calculate the rotational components of the gravity vector, so we can decompose into a rotation around Z and a rotation around X. Gravity doesn't cause rotations around Y.
+				Vec3 rz = project(frame.gravity, {0, 0, 1}).normalize();
+				Quat qz = rotate(rz, {0, -1, 0}, {0, 0, 1});
+				
+				Vec3 rx = project(qz * frame.gravity, {1, 0, 0}).normalize();
+				Quat qx = rotate(rx, {0, -1, 0}, {1, 0, 0});
 
 				// The device transform should shift the image frames into the same frame of reference as the sensor data.
 				// The iPhone camera is rotated -90_deg around the Z axis:
-				Mat44 device_transform = rotate<Z>(-90_deg);
-
-				cache->global_transform = rotate<Y>(-frame.bearing) << cache->global_transform << renderer_transform << device_transform;
+				cache->global_transform = rotate<Y>(-frame.bearing) << qx << qz << renderer_transform << camera_transform;
+				//cache->global_transform = rotate<Y>(-frame.bearing) << q << renderer_transform << device_transform;
 
 				// Calculate the local transform, if any:
 				if (previous) {
@@ -322,6 +319,11 @@ namespace TransformFlow
 				{
 					binding.set_uniform("display_matrix", _renderer_state->viewport->display_matrix() * frame->global_transform);
 					
+					// Draw gravity vector:
+					binding.set_uniform("major_color", Vec4(0.0, 1.0, 0.4, 0.89));
+					_wireframe_renderer->render(LineSegment3(ZERO, frame->video_frame.gravity * 20));
+					
+					// Draw chains:
 					Ref<FeaturePoints> feature_points = frame->feature_points();
 					Ref<FeatureTable> table = feature_points->table();
 					
