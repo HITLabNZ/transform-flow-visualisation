@@ -22,6 +22,10 @@ To run Transform Flow visualisation with the included sample data:
 
 Currently, only Mac OS X and Linux are supported using standards conformant C++11 compilers.
 
+Some systems are set up with a low number of open file descriptors by default. If you have a problem with the application quitting because it is unable to open files, increase the limit:
+
+	$ ulimit -n 10000
+
 [teapot]: http://www.kyusu.org
 
 ## Controls
