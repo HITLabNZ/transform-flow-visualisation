@@ -335,6 +335,7 @@ namespace TransformFlow
 
 				buffer << "Gravity: " << first_frame.gravity << std::endl;
 				buffer << "Bearing: " << first_frame.bearing * R2D << std::endl;
+				buffer << "Heading: " << first_frame.heading << std::endl;
 				buffer << "Tilt: " << first_frame.tilt.value * R2D << std::endl;
 				buffer << "Time Offset: " << first_frame.image_update->time_offset << std::endl;
 				//buffer << "Tilt: " << first_image_update.tilt() * R2D << std::endl;
