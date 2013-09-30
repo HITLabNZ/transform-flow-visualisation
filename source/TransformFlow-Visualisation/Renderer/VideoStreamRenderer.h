@@ -81,8 +81,6 @@ namespace TransformFlow
 				
 				void calculate_feature_transform(Shared<FrameCache> previous);
 				void select(std::size_t index);
-				
-				void find_vertical_edges();
 			};
 			
 			std::vector<Shared<FrameCache>> _frame_cache;
@@ -112,7 +110,6 @@ namespace TransformFlow
 			}
 
 			bool apply_feature_algorithm();
-			void find_vertical_edges();
 		};
 	}
 }

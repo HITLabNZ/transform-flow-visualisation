@@ -108,29 +108,6 @@ namespace TransformFlow
 			}
 		}
 
-		// Deprecated...
-		void VideoStreamRenderer::FrameCache::find_vertical_edges()
-		{
-			if (selected_feature_index != (std::size_t)-1) {
-				// We just use 2-space gravity as we are interested in the delta as applied to the captured image. If the camera is pointing up or down, the gravity vector can't be easily applied to the image.
-				Vec2 gravity = (global_transform * video_frame.gravity).reduce();
-				
-				if (gravity.length_squared() < 0.01) {
-					return;
-				}
-				
-				gravity.normalize();
-				
-				Vec2i point = feature_points()->offsets()[selected_feature_index];
-				
-				for (std::size_t i = 0; i < 10; i += 1) {
-					Vec2i offset = point + (gravity * i);
-
-					writer(*image_buffer()).set(offset, Vector<3, ByteT>(255, 0, 0));
-				}
-			}
-		}
-		
 		VideoStreamRenderer::VideoStreamRenderer(Ptr<RendererState> renderer_state) : _renderer_state(renderer_state)
 		{
 			_marker_renderer = new MarkerRenderer(renderer_state);
@@ -210,6 +187,15 @@ namespace TransformFlow
 				cache->video_frame = frame;
 				cache->global_transform = IDENTITY;
 
+				/*
+				Vec3 pyz = frame.gravity, pxy = frame.gravity;
+				pyz[X] = 0;
+				pxy[Z] = 0;
+
+				pyz = pyz.normalize();
+				pxy = pxy.normalize();
+				*/
+
 				// Calculate the rotational components of the gravity vector, so we can decompose into a rotation around Z and a rotation around X. Gravity doesn't cause rotations around Y.
 				Vec3 rz = project(frame.gravity, {0, 0, 1}).normalize();
 				Quat qz = rotate(rz, {0, -1, 0}, {0, 0, 1});
@@ -245,7 +231,7 @@ namespace TransformFlow
 				// Setup particles
 				for (Vec2 offset : cache->feature_points()->offsets()) {
 					Vec2 center = (offset / _scale) + cache->image_box.min();
-					
+
 					cache->marker_particles->add(center << 0, Vec3(0.5, 0.5, 0), Vec3(0, 0, 1), Vec2u(1, 1));
 				}
 
@@ -320,8 +306,8 @@ namespace TransformFlow
 					binding.set_uniform("display_matrix", _renderer_state->viewport->display_matrix() * frame->global_transform);
 					
 					// Draw gravity vector:
-					binding.set_uniform("major_color", Vec4(0.0, 1.0, 0.4, 0.89));
-					_wireframe_renderer->render(LineSegment3(ZERO, frame->video_frame.gravity * 20));
+					//binding.set_uniform("major_color", Vec4(0.0, 1.0, 0.4, 0.89));
+					//_wireframe_renderer->render(LineSegment3(ZERO, frame->video_frame.gravity * 20));
 					
 					// Draw chains:
 					Ref<FeaturePoints> feature_points = frame->feature_points();
@@ -429,14 +415,6 @@ namespace TransformFlow
 			}
 			
 			return false;
-		}
-		
-		void VideoStreamRenderer::find_vertical_edges() {
-			Shared<FrameCache> frame = _frame_cache[_frame_index];
-			
-			frame->find_vertical_edges();
-			
-			_pixel_buffer_renderer->invalidate(frame->image_buffer());
 		}
 
 		bool VideoStreamRenderer::apply_feature_algorithm() {
