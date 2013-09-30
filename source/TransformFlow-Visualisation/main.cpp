@@ -110,7 +110,7 @@ namespace TransformFlow
 		_camera = new BirdsEyeCamera;
 		_camera->set_distance(10);
 		_camera->set_multiplier(Vec3(0.1, 0.1, 0.01));
-		_camera->set_up(Vec3(0, 1, 0));
+		_camera->set_up(Vec3(0, 0, 1));
 
 		_projection = new PerspectiveProjection(R90 * 0.7, 1, 1024 * 12);
 		_viewport = new Viewport(_camera, _projection);

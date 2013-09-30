@@ -187,26 +187,12 @@ namespace TransformFlow
 				cache->video_frame = frame;
 				cache->global_transform = IDENTITY;
 
-				/*
-				Vec3 pyz = frame.gravity, pxy = frame.gravity;
-				pyz[X] = 0;
-				pxy[Z] = 0;
-
-				pyz = pyz.normalize();
-				pxy = pxy.normalize();
-				*/
-
-				// Calculate the rotational components of the gravity vector, so we can decompose into a rotation around Z and a rotation around X. Gravity doesn't cause rotations around Y.
-				Vec3 rz = project(frame.gravity, {0, 0, 1}).normalize();
-				Quat qz = rotate(rz, {0, -1, 0}, {0, 0, 1});
-				
-				Vec3 rx = project(qz * frame.gravity, {1, 0, 0}).normalize();
-				Quat qx = rotate(rx, {0, -1, 0}, {1, 0, 0});
+				// This function computes the rotation from the device coordinates to global coordinates:
+				Quat q = local_camera_transform(frame.gravity, frame.bearing);
 
 				// The device transform should shift the image frames into the same frame of reference as the sensor data.
 				// The iPhone camera is rotated -90_deg around the Z axis:
-				cache->global_transform = rotate<Y>(-frame.bearing) << qx << qz << renderer_transform << camera_transform;
-				//cache->global_transform = rotate<Y>(-frame.bearing) << q << renderer_transform << device_transform;
+				cache->global_transform = q.conjugate() << renderer_transform << camera_transform;
 
 				// Calculate the local transform, if any:
 				if (previous) {
