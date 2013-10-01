@@ -29,6 +29,8 @@
 
 #include <Euclid/Geometry/Generate/Planar.h>
 
+#include <Euclid/Numerics/Distribution.h>
+
 #include <TransformFlow/VideoStream.h>
 #include <TransformFlow/BasicSensorMotionModel.h>
 #include <TransformFlow/HybridMotionModel.h>
@@ -80,6 +82,12 @@ namespace TransformFlow
 		Ref<ImageRenderer> _text_renderer;
 		Ref<Program> _text_program;
 
+		std::size_t _tracking_point_sequence;
+
+		void dump_tracking_points();
+		void reset_tracking_points();
+		void evaluate_tracking_points_bearing();
+
 	public:
 		virtual ~ImageSequenceScene ();
 		
@@ -106,6 +114,8 @@ namespace TransformFlow
 		glEnable(GL_DEPTH_TEST);
 		
 		check_graphics_error();
+		
+		_tracking_point_sequence = 0;
 		
 		_camera = new BirdsEyeCamera;
 		_camera->set_distance(10);
@@ -267,7 +277,7 @@ namespace TransformFlow
 			return true;
 		} else if (input.key().button() == MouseScroll) {
 			camera.set_distance(camera.distance() + (d[Y] * camera.multiplier()[Z]));
-						
+
 			return true;
 		} else {
 			return false;
@@ -282,6 +292,76 @@ namespace TransformFlow
 		}
 		
 		return camera_motion(*_camera, input);
+	}
+	
+	void ImageSequenceScene::dump_tracking_points()
+	{
+		// Dump the tracking points:
+		for (auto & frame : _video_stream_renderer->frame_cache()) {
+			if (frame->selected_feature_index == (std::size_t)-1) continue;
+			
+			auto feature_points = frame->feature_points();
+			auto offset = feature_points->offsets().at(frame->selected_feature_index);
+		
+			std::cerr << frame->video_frame.index << ", " << _tracking_point_sequence << ", " << offset[X] << ", " << offset[Y] << std::endl;
+		}
+		
+		_tracking_point_sequence += 1;
+	}
+	
+	void ImageSequenceScene::reset_tracking_points()
+	{
+		// Reset the tracking points (breaks the visualisation a wee bit):
+		for (auto & frame : _video_stream_renderer->frame_cache()) {
+			frame->selected_feature_index = (std::size_t)-1;
+		}
+	}
+	
+	Radians<> bearing_of_global_coordinate(Vec3 coordinate)
+	{
+		// Project on XY plane:
+		coordinate[Z] = 0;
+		coordinate = coordinate.normalize();
+
+		// Compute the rotation from north:
+		Quat q = rotate<3>({0, 1, 0}, coordinate, {0, 0, 1});
+		auto bearing = q.angle() * q.axis().dot({0, 0, -1});
+		
+		return bearing;
+	}
+	
+	void ImageSequenceScene::evaluate_tracking_points_bearing()
+	{
+		using namespace Euclid::Numerics;
+		
+		auto & frame_cache = _video_stream_renderer->frame_cache();
+		std::unordered_map<std::size_t, Distribution<>> distributions;
+		
+		for (auto & frame : frame_cache) {
+			for (auto & pair : frame->video_frame.tracking_points) {
+				auto & distribution = distributions[pair.first];
+				
+				// Only support 2D at the moment:
+				auto global_coordinate = frame->global_coordinate_of_pixel_coordinate(pair.second.coordinate.reduce());
+				
+				auto bearing = R2D * bearing_of_global_coordinate(global_coordinate);
+				
+				if (bearing < 0) bearing += 360.0;
+				
+				distribution.add_sample(bearing);
+			}
+		}
+		
+		for (auto & pair : distributions) {
+			auto & d = pair.second;
+			
+			std::cout << "Tracking Point Index " << pair.first << "(# = " << d.number_of_samples() << ")" << std::endl;
+			std::cout << d.minimum() << ", " << d.maximum() << ", " << d.average() << ", " << d.standard_deviation() << ", " << d.standard_error() << std::endl;
+			
+			for (auto & sample : d.samples())
+				std::cout << sample << ", ";
+			std::cout << std::endl;
+		}
 	}
 	
 	bool ImageSequenceScene::button (const ButtonInput & input)
@@ -304,6 +384,16 @@ namespace TransformFlow
 			
 			_video_stream_renderer->set_range(range);
 			return true;
+		} else if (input.button_pressed('d')) {
+			dump_tracking_points();
+			
+			return true;
+		} else if (input.button_pressed('r')) {
+			reset_tracking_points();
+			
+			return true;
+		} else if (input.button_pressed('c')) {
+			evaluate_tracking_points_bearing();
 		}
 		
 		return false;
@@ -352,12 +442,13 @@ namespace TransformFlow
 
 					auto global_coordinate = frame_cache->global_coordinate_of_pixel_coordinate(feature);
 
-					global_coordinate[Y] = 0;
-					global_coordinate = global_coordinate.normalize();
+					auto bearing = bearing_of_global_coordinate(global_coordinate);	
 
-					Quat rotation = rotate<3>({0, 0, -1}, global_coordinate, {0, 1, 0});
+					buffer << "Bearing: " << (bearing * R2D) << std::endl;
+				}
 
-					buffer << "Bearing: " << rotation.angle() * R2D << std::endl;
+				for (auto & pair : first_frame.tracking_points) {
+					buffer << pair.first << ": " << pair.second.coordinate << std::endl;
 				}
 
 				if (image_update->image_buffer) {
@@ -432,7 +523,10 @@ namespace TransformFlow
 		
 		Ref<SceneManager> scene_manager = new SceneManager(_context, thread->loop(), _loader);
 
-		Ref<VideoStream> video_stream = new VideoStream(_data_path, _motion_model);
+		Ref<Resources::Loader> data_loader = new Resources::Loader(_data_path);
+		data_loader->add_loader(new Image::Loader);
+
+		Ref<VideoStream> video_stream = new VideoStream(data_loader, _motion_model);
 		
 		Ref<ImageSequenceScene> image_sequence_scene = new ImageSequenceScene;
 		image_sequence_scene->set_video_stream(video_stream);

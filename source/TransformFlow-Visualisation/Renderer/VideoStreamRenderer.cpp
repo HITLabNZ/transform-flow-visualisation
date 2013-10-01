@@ -159,12 +159,6 @@ namespace TransformFlow
 		{
 		}
 
-		// Return the vector component of u orthogonal to v:
-		static Vec3 project(const Vec3 & u, const Vec3 & v)
-		{
-			return u - (v * (u.dot(v) / v.dot(v)));
-		}
-
 		void VideoStreamRenderer::update_cache(Ptr<VideoStream> video_stream)
 		{
 			Shared<FrameCache> previous;
@@ -173,6 +167,8 @@ namespace TransformFlow
 			
 			for (auto & frame : video_stream->frames())
 			{
+				if (!frame.valid) continue;
+				
 				// Calculate the image box:
 				Vec2 box_size = Vec2(frame.image_update->image_buffer->size()) / _scale;
 				AlignedBox2 image_box = AlignedBox2::from_center_and_size(ZERO, box_size);
@@ -219,6 +215,14 @@ namespace TransformFlow
 					Vec2 center = (offset / _scale) + cache->image_box.min();
 
 					cache->marker_particles->add(center << 0, Vec3(0.5, 0.5, 0), Vec3(0, 0, 1), Vec2u(1, 1));
+				}
+
+				for (auto & pair : frame.tracking_points) {
+					Vec2 offset = pair.second.coordinate;
+					
+					Vec2 center = (offset / _scale) + cache->image_box.min();
+
+					cache->feature_particles->add(center << 0, Vec3(0.5, 0.5, 0), Vec3(0, 0, 1), Vec2u(0, 0), Vec3(0, 0, 1));
 				}
 
 				//for (Vec2 offset : find_key_points(cache->image_buffer())) {
