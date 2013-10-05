@@ -4,13 +4,13 @@ dream-client:
   :commit: eb88823af0cbce66782fe6458217b0dd085cce4f
 transform-flow:
   :branch: master
-  :commit: 8e6035e9840720cdf3351d0a91877a45aecf9e1f
+  :commit: d2b0b2646a9b439f8cf62945c6db0b48a6b14432
 dream:
   :branch: master
   :commit: 0d67847d485101f753e9e69dd380a7493ccaa96d
 dream-imaging:
   :branch: master
-  :commit: 4401546bb057283b1524955f772e3f6da2935bc2
+  :commit: 4564d47e1b3aa5510260db5ad335b592738c973e
 opencv:
   :branch: master
   :commit: 3d1c26836ee119e6f7f214b8ec8a0408a41bb7ed
@@ -19,7 +19,7 @@ utf8:
   :commit: 299d10bd57a4deda3e7f8ea0744d1be258b51d2b
 euclid:
   :branch: master
-  :commit: bfbb6661efe125554c489f28c26c8ddb1475f686
+  :commit: 992ae1252e97df3c9245d28d03b34563304a865d
 unit-test:
   :branch: master
   :commit: 90d9132fc11641d3cdef1e642325b75b2b48ab3a
@@ -37,7 +37,7 @@ variants:
   :commit: 6f3c1de3c0a6254e1fed58fc68fd8a96218f28e7
 platform-darwin-osx:
   :branch: master
-  :commit: f4d44599a7377f077767f4056c603b03f6e20a98
+  :commit: f4bc18296422582d8b31462664636e505cb251e9
 platform-darwin-ios:
   :branch: master
   :commit: 3aac5dcd28f8a13db7891e230b621fa95f060636
