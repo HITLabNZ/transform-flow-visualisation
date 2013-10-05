@@ -303,23 +303,6 @@ namespace TransformFlow
 					Ref<FeaturePoints> feature_points = frame->feature_points();
 					Ref<FeatureTable> table = feature_points->table();
 					
-					binding.set_uniform("major_color", Vec4(1.0, 0.4, 0.4, 0.89));
-
-					for (auto chain : table->chains()) {
-						std::vector<Vec3> points;
-
-						while (chain != nullptr) {
-							Vec2 normalized_point = chain->offset / frame->image_buffer()->size();
-							Vec2 center = frame->image_box.absolute_position_of(normalized_point);
-
-							points.push_back(center << 0.01);
-
-							chain = chain->next;
-						}
-
-						_wireframe_renderer->render(points, LINE_STRIP);
-					}
-					
 					binding.set_uniform("major_color", Vec4(0.1, 0.2, 1.0, 0.75));
 
 					// *** Render horizontal scan lines
