@@ -317,7 +317,7 @@ namespace TransformFlow
 		}
 	}
 	
-	Radians<> bearing_of_global_coordinate(Vec3 coordinate)
+	static Radians<> bearing_of_global_coordinate(Vec3 coordinate)
 	{
 		// Project on XY plane:
 		coordinate[Z] = 0;
@@ -421,7 +421,7 @@ namespace TransformFlow
 
 			{
 				auto range = _video_stream_renderer->range();
-				auto & first_frame = _video_stream->frames().at(range[0]);
+				auto & first_frame = _video_stream_renderer->frame_cache().at(range[0])->video_frame;
 
 				buffer << "Gravity: " << first_frame.gravity << std::endl;
 				buffer << "Bearing: " << first_frame.bearing * R2D << std::endl;
@@ -442,9 +442,9 @@ namespace TransformFlow
 
 					auto global_coordinate = frame_cache->global_coordinate_of_pixel_coordinate(feature);
 
-					auto bearing = bearing_of_global_coordinate(global_coordinate);	
+					auto bearing = bearing_of_global_coordinate(global_coordinate);
 
-					buffer << "Bearing: " << (bearing * R2D) << std::endl;
+					buffer << "Feature Bearing: N+" << (bearing * R2D) << std::endl;
 				}
 
 				for (auto & pair : first_frame.tracking_points) {
